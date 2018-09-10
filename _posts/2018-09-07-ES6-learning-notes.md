@@ -177,3 +177,151 @@ ES6 内部使用严格相等运算符（`===`），判断一个位置是否有�
 	// 上面代码中，数值和布尔值的包装对象都有toString属性，因此变量s都能取到值。
 
 解构赋值的规则是，只要等号右边的值不是对象或数组，就先将其转为对象。由于undefined和null无法转为对象，所以对它们进行解构赋值，都会报错。
+
+### 函数参数的解构赋值 ###
+
+	function add([x, y]) {
+		return x + y;
+	}
+	add([1, 2]); // 3
+
+	[[1, 2], [3, 4]].map(([a, b]) => a + b);
+	// [ 3, 7 ]
+
+#### 函数参数解构的默认值 ####
+
+例子1
+
+	function move({x = 0, y = 0} = {}) {
+	    return [x, y];
+	}
+	console.log(move({x: 3, y: 8}));// [3, 8]
+	//说明：传递了实参，所以函数默认值{}不生效，对实参{x: 3, y: 8}解构赋值，对应的属性都有值，所以解构赋值的默认值不生效，所以x = 3，y = 8；
+	
+	console.log(move({x: 3}));// [3, 0]
+	//说明：传递了实参，所以函数默认值{}不生效，对实参{x: 3}解构赋值，对应的属性x有值，y没有值，所以解构赋值的默认值y生效,x不生效，所以x = 3，y = 0；
+
+	console.log(move({}));// [0, 0]
+	//说明：传递了实参{}，所以函数默认值{}不生效，对实参{}解构赋值，对应的属性都没有值，所以解构赋值的默认值生效，所以x = 0，y = 0；
+
+	console.log(move());// [0, 0]
+	//说明：没有传递实参，所以函数默认值{}生效，对实参{}解构赋值，对应的属性都没有值，所以解构赋值的默认值生效，所以x = 0，y = 0；
+
+例子2
+
+	function move({x, y} = { x: 0, y: 0 }) {
+       return [x, y];
+    }
+    console.log(move({x: 3, y: 8})); // [3, 8]
+	//说明：传递了实参，所以函数默认值{x: 0, y: 0}不生效，对实参{x: 3, y: 8}解构赋值，对应的属性都有值，所以解构赋值的默认值不生效，所以x = 3，y = 8；
+	
+	console.log(move({x: 3})); // [3, undefined]
+	//说明：传递了实参，所以函数默认值{x: 0, y: 0}不生效，对实参{x: 3}解构赋值，对应的属性x有值，y没有值，所以x=3,因为本例没有解构赋值的默认值，所以y就是undefined；
+
+	console.log(move({})); // [undefined, undefined]
+	//说明：传递了实参{}，所以函数默认值{x: 0, y: 0}不生效，对实参{}解构赋值，对应的属性没有值，所以x,y就是undefined；
+	
+	console.log(move()); // [0, 0]
+	//说明：没有传递实参，所以函数默认值{x: 0, y: 0}生效，对实参{x: 0, y: 0}解构赋值，对应的属性有值，所以x,y就是0；
+
+1. 判断调用过程中是否传递参数？若传递，用传递的实际参数为函数参数的默认值进行解构赋值；
+2. 确定了解构赋值的对象后，看实参或函数参数默认值有没有变量中的对应属性，没有就解构默认值生效，否则解构默认值不生效。
+
+### 使用圆括号的情况 ###
+
+使用圆括号的情况只有一种：赋值语句的非模式部分，可以使用圆括号。
+
+	[(b)] = [3]; // 正确
+	({ p: (d) } = {}); // 正确
+	[(parseInt.prop)] = [3]; // 正确
+
+上面三行语句都可以正确执行，因为首先它们都是赋值语句，而不是声明语句；其次它们的圆括号都不属于模式的一部分。第一行语句中，模式是取数组的第一个成员，跟圆括号无关；第二行语句中，模式是p，而不是d；第三行语句与第一行语句的性质一致。
+
+## 解构赋值 用途 ##
+
+#### 交换变量的值 ####
+
+	let x = 1;
+	let y = 2;
+	[x, y] = [y, x];
+
+#### 函数返回多个值 ####
+
+	// 返回一个数组
+	function example() {
+	  return [1, 2, 3];
+	}
+	let [a, b, c] = example();
+	// 返回一个对象
+	function example() {
+	  return {
+	    foo: 1,
+	    bar: 2
+	  };
+	}
+	let { foo, bar } = example();
+
+#### 函数参数 ####
+
+	// 参数是一组有次序的值
+	function f([x, y, z]) { ... }
+	f([1, 2, 3]);
+	// 参数是一组无次序的值
+	function f({x, y, z}) { ... }
+	f({z: 3, y: 2, x: 1});
+
+#### 提取JSON数据 ####
+
+	let jsonData = {
+	  id: 42,
+	  status: "OK",
+	  data: [867, 5309]
+	};
+	let { id, status, data: number } = jsonData;
+	console.log(id, status, number);
+	// 42, "OK", [867, 5309]
+
+#### 函数参数的默认值 ####
+	
+	jQuery.ajax = function (url, {
+	  async = true,
+	  beforeSend = function () {},
+	  cache = true,
+	  complete = function () {},
+	  crossDomain = false,
+	  global = true,
+	  // ... more config
+	}) {
+	  // ... do stuff
+	};
+
+#### 遍历Map结构 ####
+
+部署了Iterator接口的对象，都可以用`for of`循环遍历。Map原生支持该接口，配合变量的解构赋值，获取`key`和`value`就很方便。
+
+	var map = new Map();
+	map.set('first', 'hello');
+	map.set('second', 'world');
+	
+	for (let [key, value] of map) {
+	  console.log(key + " is " + value);
+	}
+	// first is hello
+	// second is world
+
+	// 获取键名
+	for (let [key] of map) {
+	  // ...
+	}
+	// 获取键值
+	for (let [,value] of map) {
+	  // ...
+	}
+
+#### 输入模块的指定方法 ####
+加载模块时，往往需要指定输入哪些方法。解构赋值使得输入语句非常清晰。
+
+	const { SourceMapConsumer, SourceNode } = require("source-map");
+
+## 字符串拓展 ##
+
