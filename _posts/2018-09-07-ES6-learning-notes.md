@@ -325,3 +325,96 @@ ES6 内部使用严格相等运算符（`===`），判断一个位置是否有�
 
 ## 字符串拓展 ##
 
+#### includes(), startsWith(), endsWith() ####
+
+`includes()`：返回布尔值，表示是否找到了参数字符串。
+`startsWith()`：返回布尔值，表示参数字符串是否在源字符串的头部。
+`endsWith()`：返回布尔值，表示参数字符串是否在源字符串的尾部。
+	
+第二个参数，表示开始搜索的位置。
+
+	var s = 'Hello world!';
+	
+	s.startsWith('world', 6) // true
+	s.endsWith('Hello', 5) // true
+	s.includes('Hello', 6) // false
+
+`endsWith`的行为与其他两个方法有所不同。它针对前n个字符，而其他两个方法针对从第n个位置直到字符串结束。
+
+`repeat`方法返回一个新字符串，表示将原字符串重复n次。
+
+	'x'.repeat(3) // "xxx"
+	'hello'.repeat(2) // "hellohello"
+	'na'.repeat(0) // ""
+
+`padStart()`用于头部补全，`padEnd()`用于尾部补全。
+
+    'x'.padStart(5, 'ab') // 'ababx'
+    'x'.padStart(4, 'ab') // 'abax'
+    'x'.padEnd(5, 'ab') // 'xabab'
+    'x'.padEnd(4, 'ab') // 'xaba'
+
+`padStart`的常见用途是为数值补全指定位数。
+    
+    '1'.padStart(10, '0') // "0000000001"
+    '12'.padStart(10, '0') // "0000000012"
+    '123456'.padStart(10, '0') // "0000123456"
+
+另一个用途是提示字符串格式。
+    
+    '12'.padStart(10, 'YYYY-MM-DD') // "YYYY-MM-12"
+    '09-12'.padStart(10, 'YYYY-MM-DD') // "YYYY-09-12"
+
+### 模板字符串 ###
+
+用反引号（`）标识。它可以当作普通字符串使用，也可以用来定义多行字符串，或者在字符串中嵌入变量。
+
+    // 普通字符串
+    `In JavaScript '\n' is a line-feed.`
+    
+    // 多行字符串
+    `In JavaScript this is
+     not legal.`
+    
+    console.log(`string text line 1
+    string text line 2`);
+    
+    // 字符串中嵌入变量
+    var name = "Bob", time = "today";
+    `Hello ${name}, how are you ${time}?`
+
+如果使用模板字符串表示多行字符串，所有的空格和缩进都会被保留在输出之中。
+
+    $('#list').html(`
+    <ul>
+      <li>first</li>
+      <li>second</li>
+    </ul>
+    `);
+
+上面代码中，所有模板字符串的空格和换行，都是被保留的，比如`<ul>`标签前面会有一个换行。如果你不想要这个换行，可以使用`trim`方法消除它。
+
+    $('#list').html(`
+    <ul>
+      <li>first</li>
+      <li>second</li>
+    </ul>
+    `.trim());
+
+模板字符串中嵌入变量，需要将变量名写在`${}`之中。
+
+大括号内部可以放入任意的JavaScript表达式，可以进行运算，以及引用对象属性。
+
+    var x = 1;
+    var y = 2;
+    
+    `${x} + ${y} = ${x + y}`
+    // "1 + 2 = 3"
+    
+    `${x} + ${y * 2} = ${x + y * 2}`
+    // "1 + 4 = 5"
+    
+    var obj = {x: 1, y: 2};
+    `${obj.x + obj.y}`
+    // 3
+
