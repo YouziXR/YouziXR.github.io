@@ -479,3 +479,13 @@ ES6 内部使用严格相等运算符（`===`），判断一个位置是否有�
 	  }
 	  return s;
 	}
+
+上面代码中，`sender`变量往往是用户提供的，经过`SaferHTML`函数处理，里面的特殊字符都会被转义。
+
+	var sender = '<script>alert("abc")</script>'; // 恶意代码
+	var message = SaferHTML`<p>${sender} has sent you a message.</p>`;
+	message
+	// <p>&lt;script&gt;alert("abc")&lt;/script&gt; has sent you a message.</p>
+
+另一个应用，就是多语言转换（国际化处理）。
+
