@@ -1,6 +1,13 @@
 # ES6的一些新特性的学习 #
+
+## 前言 ##
+
+本文建立在学习阮一峰老师的ES6教程之上，总结了一些我自己认为重要的点，主要面向我本人，偏向于学习笔记的形式，主要参考 [http://jsrun.net/tutorial/cZKKp](http://jsrun.net/tutorial/cZKKp)
+
 ## let&const ##
+
 ### 块级作用域block ###
+
 `let`只在块级作用域中有效
 
 	{	let x = 1;	}
@@ -418,3 +425,57 @@ ES6 内部使用严格相等运算符（`===`），判断一个位置是否有�
     `${obj.x + obj.y}`
     // 3
 
+### 标签模板 ###
+
+模板标签是函数调用的一种特殊形式，标签指的是函数，后面模板字符串就是函数参数。
+
+但如果模板字符串里有变量，会将字符串处理成多个参数，再调用函数。
+
+	var a = 5;
+	var b = 10;
+	tag`Hello ${ a + b } world ${ a * b }`;
+	// 等同于
+	tag(['Hello ', ' world ', ''], 15, 50);
+
+`tag`函数的第一个参数是一个数组，该数组的成员是模板字符串中那些没有变量替换的部分，也就是说，变量替换只发生在数组的第一个成员与第二个成员之间、第二个成员与第三个成员之间，以此类推。
+
+`tag`函数的其他参数，都是模板字符串各个变量被替换后的值。由于本例中，模板字符串含有两个变量，因此`tag`会接受到`value1`和`value2`两个参数。
+
+模板字符串中有2个变量，说明字符串数组里应该有3个变量，所以字符串数组中最后加了一个`""`空串来补足。
+
+	var total = 30;
+	var msg = passthru`The total is ${total} (${total*1.05} with tax)`;
+	function passthru(literals, ...values) {
+	  var output = "";
+	  for (var index = 0; index < values.length; index++) {
+	    output += literals[index] + values[index];
+	  }
+	
+	  output += literals[index];
+	// 这里需要将字符串数组中的最后一个值添加进去
+	// 字符串数组比参数多1
+	  return output;
+	}
+
+#### 模板标签的应用 ####
+
+过滤HTML字符串，防止用户输入恶意内容。
+
+	var message =
+	  SaferHTML`<p>${sender} has sent you a message.</p>`;
+	
+	function SaferHTML(templateData) {
+	  var s = templateData[0];
+	  for (var i = 1; i < arguments.length; i++) {
+	    var arg = String(arguments[i]);
+	
+	    // Escape special characters in the substitution.
+	    s += arg.replace(/&/g, "&amp;")
+	            .replace(/</g, "&lt;")
+	            .replace(/>/g, "&gt;");
+	
+	    // Don't escape special characters in the template.
+	    s += templateData[i];
+	  }
+	  return s;
+	}
