@@ -2,7 +2,7 @@
 
 ## 前言 ##
 
-本文建立在学习阮一峰老师的ES6教程之上，总结了一些我自己认为重要的点，主要面向我本人，偏向于学习笔记的形式，主要参考 [http://jsrun.net/tutorial/cZKKp](http://jsrun.net/tutorial/cZKKp "ES6 全套教程 ECMAScript6 (原著:阮一峰) ")
+本文建立在学习阮一峰老师的ES6教程之上，总结了一些我自己认为重要的点，主要面向我本人，偏向于学习笔记的形式，主要参考 [http://jsrun.net/tutorial/cZKKp](http://jsrun.net/tutorial/cZKKp "ES6 全套教程 ECMAScript6 原著:阮一峰 ") 和 [http://es6.ruanyifeng.com/](http://es6.ruanyifeng.com/ "阮一峰ES6")
 
 ## let&const ##
 
@@ -10,7 +10,9 @@
 
 `let`只在块级作用域中有效
 
-	{	let x = 1;	}
+	{	
+		let x = 1;	
+	}
 	x // ReferenceError
 
 	var a = [];
