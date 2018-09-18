@@ -384,4 +384,30 @@ ES6规定只要函数参数使用了默认值，解构赋值，扩展运算符�
 	// 箭头函数写法
 	[1,2,3].map(x => x * x);
 	// sort
-	
+	var result = values.sort(function (a, b){
+		return a - b;
+	});
+	// arrow function
+	var result = values.sort((a, b) => a-b);
+
+rest参数与箭头函数结合使用
+
+	const numbers = (...nums) => nums;
+	numbers(1, 2, 3, 4, 5)
+	// [1,2,3,4,5]
+	const headAndTail = (head, ...tail) => [head, tail];
+	headAndTail(1, 2, 3, 4, 5)
+	// [1,[2,3,4,5]]
+
+#### 插播一条sort函数 ####
+
+`Array.prototype.sort()`用来对数组进行排序，参数为指定某种顺序进行排序的函数`compareFunction(a, b)`。如果省略参数，数组元素会按照转换后的字符串各字符的Unicode位点进行排序。返回值为排序后的数组，原数组已经原地排序。
+
+- 如果`compareFunction(a, b)`返回值小于0，那么a会被排到b前面；
+- 如果返回值等于0，位置不变；
+- 如果返回值大于0，那么b会被排到a前面。
+
+#### 箭头函数注意点 ####
+
+1. 函数体内部`this`就是定义时所在的对象，而不是使用时所在的对象。在MDN文档中写到，箭头函数不会创建自己的`this`，只会从自己的作用域链的上一层继承`this`
+2. 不能把箭头函数当成构造函数。
