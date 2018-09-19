@@ -411,3 +411,87 @@ rest参数与箭头函数结合使用
 
 1. 函数体内部`this`就是定义时所在的对象，而不是使用时所在的对象。在MDN文档中写到，箭头函数不会创建自己的`this`，只会从自己的作用域链的上一层继承`this`
 2. 不能把箭头函数当成构造函数。
+3. 不能使用`arguments`对象，可使用rest参数替代。
+4. 不能使用`yield`命令，因此箭头函数不能用作Generator函数。
+
+例子：
+
+	function foo() {
+	  return () => {
+	    return () => {
+	      return () => {
+	        console.log('id:', this.id); 
+			// 所有箭头函数的this都等于foo的this
+	      };
+	    };
+	  };
+	}
+	
+	var f = foo.call({id: 1}); 
+	// 这里把foo的this绑定在了对象{id: 1}上，所以箭头函数的this都指向了这个对象
+	var t1 = f.call({id: 2})()(); // id: 1
+	var t2 = f().call({id: 3})(); // id: 1
+	var t3 = f()().call({id: 4}); // id: 1
+	// 这里绑定都是针对f这个变量，改变的都是f的this对象，不影响foo，所以不会改变箭头函数的this
+	var t1 = foo.call({id: 2}); // id: 2
+	t1()()(); // 这里又改变了foo的this，指向了对象{id: 2}
+
+包括`this`在内的另外三个变量`arguments, super, new.target`，都是指向外层函数的对应变量。
+
+#### 嵌套的箭头函数 ####
+
+例子：
+
+	function insert(value) {
+	  return {into: function (array) {
+	    return {after: function (afterValue) {
+	      array.splice(array.indexOf(afterValue) + 1, 0, value);
+	      return array;
+	    }};
+	  }};
+	}
+	insert(2).into([1, 3]).after(1); //[1, 2, 3]
+
+箭头函数改写：
+
+	let insert = (value) => ({into: (array) => ({after: (afterValue) => {
+	  array.splice(array.indexOf(afterValue) + 1, 0, value);
+	  return array;
+	}})});
+	insert(2).into([1, 3]).after(1); //[1, 2, 3]
+
+部署管道(pipeline)机制的例子，前一个函数的输出是后一个函数的输入。
+
+	const pipeline = (...funcs) =>
+	  val => funcs.reduce((a, b) => b(a), val);
+	const plus1 = a => a + 1;
+	const mult2 = a => a * 2;
+	const addThenMult = pipeline(plus1, mult2);
+	addThenMult(5)
+	// 12
+	// 等同于下面的写法
+	const plus1 = a => a + 1;
+	const mult2 = a => a * 2;
+	mult2(plus1(5))
+	// 12
+
+#### array的reduce函数 ####
+
+方法对累加器和数组中的每个元素（从左到右）应用一个函数，将其简化为单个值。参数有两个，一个是`callback`回调函数，一个是可选的`initVal`初始值，用作第一次调用回调函数的第一个累计值，如果该参数未指定，则设定数组索引0位初始值，且会从数组索引1开始调用回调函数。
+
+其中回调函数包含4个参数，累加器`accumulator`是上一次回调函数返回的累积值，`currentVal`当前处理的数组元素，`currentIndex`当前处理元素的索引，`array`调用`reduce`的数组。
+
+函数返回值是累积处理的结果。
+
+例子：
+
+	let ary = [2, 4, 6, 7, 8, 0];
+	let initVal = 10;
+	ary.reduce((acc, currentVal) => acc + currentVal), initVal);
+
+### 双冒号运算符 ###
+
+提案，不谈。
+
+### 
+
