@@ -275,10 +275,7 @@
 
 方法接受三个参数。
 
-	arr.copyWithin(target[, start[, end]])
-	// target 必需：从这个index开始覆盖数据，参数为负值则+length
-	// start 可选：从这个index开始读取数据，默认0，为负值+length
-	// end 可选：从这个index前停止数据，不包括end，默认是数组长度，即从start开始到最后一个元素，为负值+length
+`arr.copyWithin(target[, start[, end]])`，`target（必需）`从这个index开始覆盖数据，参数为负值则+length；`start（可选）`从这个index开始读取数据，默认0，为负值+length；`end（可选）`从这个index前停止数据，不包括end，默认是数组长度，即从start开始到最后一个元素，为负值+length。
 
 三个参数应该都是数值，如果不是会自动转为数值。
 
