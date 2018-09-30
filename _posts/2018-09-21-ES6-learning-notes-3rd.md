@@ -376,5 +376,67 @@
 
 该方法返回一个布尔值，是数组实例方法，表示某个数组是否包含给定值。
 
-`array.includes(searchElement, fromIndex)`，参数`searchElement（必需）`需要查找的元素，`fromIndex（可选）`从该索引处开始查找。默认为0。
+`array.includes(searchElement, fromIndex)`，参数`searchElement（必需）`需要查找的元素，`fromIndex（可选）`从该索引处开始查找，为负值+length。默认为0。
+	
+	[1, 2, 3].includes(2)     // true
+	[1, 2, 3].includes(4)     // false
+	[1, 2, NaN].includes(NaN) // true
 
+ES6之前我们一般用`indexOf()`方法找出参数第一次出现的位子，其内部使用`===`运算符判断是否相等，会导致对`NaN`的误判。
+
+而`includes()`使用不一样的判断算法，没有这个问题。
+
+### flat() flatMap() ###
+
+这两个方法都是数组实例的方法，但是是实验方法，可以用在开发环境，最好不要用在发布环境，主要是针对嵌套数组，变成一维的数组，该方法返回一个新数组且对原数组么有影响。
+
+`flat(deepth)`需要一个参数，表示扁平化的层数。如果数组有空位，该方法会跳过空位。
+
+	[1, 2, [3, [4, 5]]].flat()
+	// [1, 2, 3, [4, 5]]
+	[1, [2, [3]]].flat(Infinity)
+	// [1, 2, 3]
+	[1, 2, [3, [4, 5]]].flat(2)
+	// [1, 2, 3, 4, 5]
+	[1, 2, , 4, 5].flat()
+	// [1, 2, 4, 5]
+
+`flatMap()`方法对原数组的每个成员执行一个函数，然后对返回值组成的数组执行`flat()`方法，返回一个新数组，不改变原数组。先对数组执行`Array.prototype.map()`，然后对返回的数组执行`flat()`。
+
+该方法有两个参数，回调函数和可选的`this`值。
+
+回调函数有三个参数，当前处理的元素，当前处理的索引，被调用的数组。
+
+	// 相当于 [[2, 4], [3, 6], [4, 8]].flat()
+	[2, 3, 4].flatMap((x) => [x, x * 2])
+	// [2, 4, 3, 6, 4, 8]
+	// 相当于 [[[2]], [[4]], [[6]], [[8]]].flat()
+	[1, 2, 3, 4].flatMap(x => [[x * 2]])
+	// [[2], [4], [6], [8]]
+
+### 数组空位 ###
+
+ES6明确将空位转化为`undefined`
+
+`Array.from`方法会将数组的空位转化为`undefined`，这个方法不会忽略空位。
+
+扩展运算符`...`也会转化。
+
+`entries(), keys(), values(), find(), findeIndex()`都会把空位处理成`undefined`。
+
+	Array.from(['a',,'b'])
+	// [ "a", undefined, "b" ]
+	[...['a',,'b']]
+	// [ "a", undefined, "b" ]
+	[,'a','b',,].copyWithin(2,0) 
+	// [,"a",,"a"]
+	// entries()
+	[...[,'a'].entries()] // [[0,undefined], [1,"a"]]
+	// keys()
+	[...[,'a'].keys()] // [0,1]
+	// values()
+	[...[,'a'].values()] // [undefined,"a"]
+	// find()
+	[,'a'].find(x => true) // undefined
+	// findIndex()
+	[,'a'].findIndex(x => true) // 0
