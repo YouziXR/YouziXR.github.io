@@ -27,3 +27,20 @@
 整体项目中cpu负载率60~75%。
 
 硬盘需求：如果虚机保存在服务器的本地存储上，而不是网络存储，则为服务器配置6个硬盘做RAID5，或者8个硬盘做RAID50。
+
+
+### Hypervisor
+
+虚拟机监控器，是运行在物理机和虚拟机之间的软件层，hypervisor可以将虚机和主机分离开，并且可以根据需要为每个虚机动态分配计算资源；
+
+分为`Native`和`Hosted`；
+
+原生型：hypervisor直接运行在硬件上来控制硬件资源并管理虚拟机，常见的有VMware ESXi和MS Hyper-V；
+
+宿主型：hypervisor运行在传统OS上，可以模拟出一套虚拟硬件平台，常见的有VMware workstation和oracle virtualbox；
+
+从性能角度来看两种方式都有性能的损耗，但`Native`比`Hosted`损耗小，使用企业生产环境使用的一般是原生型，宿主型的用在实验或测试环境；
+
+### ESXi
+
+ESXi是vSphere
