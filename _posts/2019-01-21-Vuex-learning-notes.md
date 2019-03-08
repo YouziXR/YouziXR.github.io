@@ -1,6 +1,8 @@
 ## 前言
 
-Vuex是专为Vue.js项目开发的状态管理模式；简单地说就是一种数据仓库管理的方法，主要是为了解决组件的共享数据的依赖和变更的问题；事实上我们需要权衡Vuex带来的效益，有时候我们使用一个简单的store模式就可以满足我们对共享数据的管理了；[https://cn.vuejs.org/v2/guide/state-management.html](https://cn.vuejs.org/v2/guide/state-management.html "Store状态管理")
+Vuex是专为Vue.js项目开发的状态管理模式；简单地说就是一种数据仓库管理的方法，主要是为了解决组件的共享数据的依赖和变更的问题；事实上我们需要权衡Vuex带来的效益，有时候我们使用一个简单的store模式就可以满足我们对共享数据的管理了；Vue官方对store模式的解读：[https://cn.vuejs.org/v2/guide/state-management.html](https://cn.vuejs.org/v2/guide/state-management.html "Store状态管理")
+
+Vuex图解：
 ![Vuex状态](https://vuex.vuejs.org/vuex.png)
 
 ### 起步
@@ -9,6 +11,10 @@ Vuex是专为Vue.js项目开发的状态管理模式；简单地说就是一种�
 
 - 响应式，从读取角度看，从store中读取的数据都是响应式的，同步更新的；
 - 显式提交commit，从写入角度看，要改变store中的状态，唯一的方式就是显式提交变异mutation，这样可以保证每次变更状态都是可追溯的。
+
+一个简单的Store：
+
+
 
 一般性的Vuex结构：
 
