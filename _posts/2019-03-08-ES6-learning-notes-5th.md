@@ -136,6 +136,85 @@
 
 #### Set间接使用Array所有方法
 
-由于`Set`和`Array`可以互相转换，所以数组方法基本上在`Set`都可以调用。
+由于`Set`和`Array`可以互相转换，所以数组方法基本上在`Set`都可以调用。套用以下模板：
 
+    let set = new Set([1,2,3])
+    set = new Set([...set].arrayMethod(...))
+	// 或者使用Array.from(set, methdod...)
 
+Set交并补集的实现：
+
+	let a = new Set([1, 2, 3]);
+	let b = new Set([4, 3, 2]);
+	
+	// 并集
+	let union = new Set([...a, ...b]);
+	// Set {1, 2, 3, 4}
+	
+	// 交集
+	let intersect = new Set([...a].filter(x => b.has(x)));
+	// set {2, 3}
+	
+	// 差集
+	let difference = new Set([...a].filter(x => !b.has(x)));
+	// Set {1}
+
+### WeakSet
+
+WeakSet结构是Set结构的特殊化，它只能存放对象，且存放的都是弱引用。即垃圾回收机制不考虑在WeakSet中对某个对象的引用，如果这个对象不再被其他对象引用，那么垃圾回收机制会自动回收这个对象的内存，不考虑这个对象还存放在WeakSet中。
+
+垃圾回收机制依赖引用计数，如果引用次数不为0，就不会释放内存占用，有些情况下会忘记取消引用，导致内存一直被占用，就可能引发内存泄漏。引入WeakSet就是为了临时存放一组对象，只要存放的对象在外部释放，那它在WeakSet里的引用就无效了，基于此，WeakSet是不可遍历的。
+
+实例对象有三个方法：
+
+- `add(val)`：添加新对象
+- `delete(val)`：清楚对象
+- `has(val)`：是否存在某个对象
+
+### Map
+
+JS中的对象是`key-value`的Hash结构，但`key`的数据类型只能是字符串；所以为了便于使用引入了`Map`结构，Map类似于对象，也是`key-value`的集合，但`key`的数据类型不仅是字符串，可以是各种类型的值。
+
+Map自身是一个构造函数，并且可以接受一个数组作为参数；
+
+	const map = new Map([
+	  ['name', '张三'],
+	  ['title', 'Author']
+	]);
+	
+	map.size // 2
+	map.has('name') // true
+	map.get('name') // "张三"
+	map.has('title') // true
+	map.get('title') // "Author"
+
+	// 实际上执行的是下面的算法
+	const items = [
+	  ['name', '张三'],
+	  ['title', 'Author']
+	];
+	
+	const map = new Map();
+	
+	items.forEach(
+	  ([key, value]) => map.set(key, value)
+	);
+
+任何具有Iterator接口、且每个成员都是双元素数组的数据结构都可以当做Map构造函数的参数；Set和Map都可以作为参数来生成新的Map。
+
+当Map的键是简单类型的值（数字、字符串、布尔值），只要值严格相等，Map就视为一个键；如果键是对象，只要对象指向的内存地址不一样，就会视为两个键。
+
+#### 实例属性和方法
+
+- size：返回Map成员总数。
+- set(key, val)：添加成员，返回整个Map结构，可以采用链式写法。
+- get(key)：获取对应的val，不存在则返回undefined。
+- has(key)：判断是否key是否在Map对象中。
+- delete(key)：删除key，返回是否删除成功。
+- clear()：清空。无返回值。
+- keys()：返回键名的遍历器。
+- values()：返回键值的遍历器。
+- entries()：返回所有成员的遍历器。
+- forEach()：遍历Map的成员。
+
+特别注意：Map的遍历顺序就插入的顺序；`for [key, val] of map`这个方法遍历Map与用entries是一样的。
