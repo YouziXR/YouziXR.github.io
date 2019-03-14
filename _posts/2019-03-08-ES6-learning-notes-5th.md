@@ -218,3 +218,20 @@ Map自身是一个构造函数，并且可以接受一个数组作为参数；
 - forEach()：遍历Map的成员。
 
 特别注意：Map的遍历顺序就插入的顺序；`for [key, val] of map`这个方法遍历Map与用entries是一样的。
+
+和Set一样，可以使用扩展运算符将Map结构转换成数组结构，就可以使用数组的各种方法，但是注意Map结构有特殊性。
+
+#### Map数据结构转换
+
+- Map<->数组：扩展运算符和Map构造函数。
+- Map<->对象：我觉得这个不用说了，用`for...of`结构取出成员组合成对象或者Map结构就行。
+- Map<->JSON：Map转JSON，可以先转成对象或者数组，再调用`JSON.stringify()`；JSON转Map，先调用`JSON.parse()`将JSON转成对象，再调用对象转Map方法。
+
+### WeakMap
+
+该结构只接受对象作为键。其他的和WeakSet差不多。典型应用有，向DOM上添加数据，很多时候DOM元素都是很占用内存的。
+
+特别注意：WeakMap结构只有键是弱引用，值还是正常引用的。
+
+只有4个方法可用：`get，set，has，delete`
+
