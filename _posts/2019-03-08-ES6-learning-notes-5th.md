@@ -235,3 +235,27 @@ Map自身是一个构造函数，并且可以接受一个数组作为参数；
 
 只有4个方法可用：`get，set，has，delete`
 
+来看一个用`WeakMap`添加私有属性的例子。
+
+    const _counter = new WeakMap();
+    const _action = new WeakMap();
+    class Countdown {
+        constructor(counter, action) {
+            _counter.set(this, counter);
+            _action.set(this, action);
+        }
+        dec() {
+            let counter = _counter.get(this);
+            if (counter < 1) return;
+            counter--;
+            _counter.set(this, counter);
+            if (counter === 0) {
+                _action.get(this)();
+            }
+        }
+    }
+    const c = new Countdown(2, () => console.log('DONE'));
+    c.dec()
+    c.dec()
+    // DONE
+
