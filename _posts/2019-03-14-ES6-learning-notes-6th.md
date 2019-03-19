@@ -143,7 +143,9 @@
 
 **子类`constructor`方法中一开始就要调用`super`方法**，否则新建实例时会报错；具体原因是因为子类自己的`this`对象必需通过父类的构造函数，得到和父类实例对象一样的属性和方法，才能构造出子类的`this`，后续再对子类进一步添加属性方法等等操作。
 
-ES6的继承机制是先将父类实例对象的属性和方法，添加到子类的`this`上，再用子类的构造函数修改子类实例对象的`this`；而ES5的继承，先创建子类实例对象`this`，再将父类方法添加到`this`上（`Parent.apply(this)`）；另外，子类如果没有显式定义`constructor`方法，这个方法会被默认添加，**只有调用`super`之后，才能使用`this`关键字**
+***ES6的继承机制是先将父类实例对象的属性和方法，添加到子类的`this`上，再用子类的构造函数修改子类实例对象的`this`；而ES5的继承，先创建子类实例对象`this`，再将父类方法添加到`this`上（`Parent.apply(this)`）**；
+
+另外，子类如果没有显式定义`constructor`方法，这个方法会被默认添加，**只有调用`super`之后，才能使用`this`关键字**
 
 
 **父类的静态方法会被子类继承**
@@ -177,7 +179,7 @@ ES6的继承机制是先将父类实例对象的属性和方法，添加到子�
 
 在前面的代码中可以看到，`super`作为函数调用时，代表了父类的构造函数，刚刚也提过，在子类的构造函数里必须执行一次`super()`；这里的`super`虽然是父类的构造函数，但其实返回的是子类的实例对象，意思是在`super`内的`this`指向了子类的实例对象，所以在上一段代码中，子类调用的`super(x,y)`，参数都被绑定在子类的实例上了；**super()作为函数时，只能在子类的构造函数constructor方法中使用**
 
-被当做对象使用时，在普通方法中，`super`指向了父类的原型对象，所以定义在构造函数上的属性无法被调用；**子类普通方法通过super调用父类方法时，方法内部的this指向当前子类的实例对象**；在静态方法中，`super`指向父类。
+被当做对象使用时，在普通方法中，**`super`指向了父类的原型对象**，所以定义在构造函数上的属性无法被调用；**子类普通方法通过super调用父类方法时，方法内部的this指向当前子类的实例对象**；**在静态方法中，`super`指向父类**。
 
     class Parent {
         constructor() {
@@ -217,16 +219,101 @@ ES6的继承机制是先将父类实例对象的属性和方法，添加到子�
 	    this.x = 1;
 	  }
 	}
-	
 	class B extends A {
 	  constructor() {
 	    super();
 	    this.x = 2;
 	    super.x = 3;
+        super.y = '?';
+        console.log(this.y); // '?'
 	    console.log(super.x); // undefined
 	    console.log(this.x); // 3
 	  }
 	}
-	
 	let b = new B();
 
+上面的例子说明了，**通过`super`对属性赋值，此时的`super`指向子类实例，赋值的属性会变成子类实例的属性**。换句话说，赋值的时候是给实例赋值的；但读取的时候，读的是父类原型对象。
+
+刚也提到过，`super`作为对象在子类静态方法中调用时，指向**父类对象本身**（不是父类原型对象），来看一个例子。
+
+    class Parent {
+    static myMethod(msg) {
+        console.log('static', msg);
+    }
+    myMethod(msg) {
+        console.log('instance', msg);
+    }
+    }
+    class Child extends Parent {
+    static myMethod(msg) {
+        super.myMethod(msg);
+    }
+    myMethod(msg) {
+        super.myMethod(msg);
+        console.log('?');
+    }
+    }
+    Child.myMethod(1); // static 1
+    var child = new Child();
+    child.myMethod(2); 
+    // instance 2
+    // ?
+
+首先明确：父类静态方法会被子类继承，类的静态方法不会被类的实例继承。所以上面这段代码，`Child.myMethod`调用的是父类的静态方法，
+`child.myMethod`调用的是实例的方法；这里要明确实例对象`child`本身继承了子类的普通方法，另外也继承了父类的普通方法，但是因为两个方法同名，所以在调用时查找原型链会先找到子类方法，也可以通过`child.__proto__.__proto__.myMethod()`找到父类的这个方法。
+
+**在子类的静态方法中通过super调用父类方法时，方法内部的this指向子类，而不是子类实例**
+
+
+#### 总结
+
+这里做一个关于`this`、`static`、`super`的总结：
+
+- 类的普通方法定义在类对象的原型上；而类的静态方法定义在类对象自身上。
+- `super`被当做对象时，在子类普通方法中指向父类的原型对象；在子类的静态方法中指向父类对象本身；所以如果在子类的静态方法里通过`super`只能调用父类的静态方法。
+- 类的实例`__proto__`指向同一个原型。
+- 子类的普通方法通过`super`调用父类的普通方法，父类方法里的`this`指向子类的实例对象；子类普通方法通过`super`无法访问到父类的静态方法。
+- 静态方法里的`this`指向类对象本身，子类里就指向子类本身，父类里还是指向子类本身。
+- 使用`super`时必须显式指定是作为函数还是对象来使用，否则会报错。
+- 由于对象总是继承自其它对象，所以在任一个对象中都可以使用`super`关键字。
+
+### 类的prototype和__proto__
+
+首先明确，类同时具有函数的`prototype`属性和对象的`__proto__`属性。
+
+1. 子类的`__proto__`属性，指向父类，表示构造函数的继承。
+2. 子类的`prototype`属性的`__proto__`属性表示方法的继承，总是指向父类的`prototype`属性。
+
+出现这样的结果是因为类的继承是分为两步的：
+
+1. 子类的实例继承父类的实例：
+`Object.setPrototypeOf(Sub.prototype, Parent.prototype)`
+2. 子类继承父类的静态属性：
+`Object.setPrototypeOf(Sub, Parent)`
+
+而`Object.setPrototypeOf()`方法实现是以下方法：
+
+    Object.setPrototypeOf = function (obj, proto) {
+        obj.__proto__ = proto;
+        return obj;
+    }
+
+#### 实例的__proto__属性
+
+子类实例的`sub.__proto__.__proto__`指向父类实例的`super.__proto__`，子类的原型的原型，是父类的原型。
+
+### 原生构造函数的继承
+
+ES6允许继承原生构造函数，使用`extends`关键字：
+
+    Boolean()
+    Number()
+    String()
+    Array()
+    Date()
+    Function()
+    RegExp()
+    Error()
+    Object()
+
+前面也提到过，ES5是先创建子类的实例，再给实例添加属性和方法，由于原生构造函数的属性和方法是无法获取的，导致了ES5环境下无法继承原生构造函数。而ES6是先创建父类的实例，父类的实例本身就继承了父类的所有属性和普通方法，然后再用子类的构造函数`constructor`，使得子类的构造函数继承父类的构造函数，
