@@ -318,3 +318,49 @@ ES6允许继承原生构造函数，使用`extends`关键字：
 
 前面也提到过，ES5是先创建子类的实例，再给实例添加属性和方法，由于原生构造函数的属性和方法是无法获取的，导致了ES5环境下无法继承原生构造函数。而ES6是先创建父类的实例，父类的实例本身就继承了父类的所有属性和普通方法，然后再用子类的构造函数`constructor`，使得子类的构造函数继承父类的构造函数，所以可以通过`extends`在原生数据结构的基础上构建自己的数据结构。
 
+### Mixin
+
+Mixin指多个对象合成一个新的对象，新对象具有各个组成员的接口，简单实现如下：
+
+    const a = {
+        a: 'a'
+    }
+    const b = {
+        b: 'b'
+    }
+    const c = {...a, ...b}
+
+完整的实现可以参考：
+
+    function mix(...mixins) {
+    class Mix {
+        constructor() {
+        for (let mixin of mixins) {
+            copyProperties(this, new mixin()); // 拷贝实例属性
+        }
+        }
+    }
+
+    for (let mixin of mixins) {
+        copyProperties(Mix, mixin); // 拷贝静态属性
+        copyProperties(Mix.prototype, mixin.prototype); // 拷贝原型属性
+    }
+
+    return Mix;
+    }
+
+    function copyProperties(target, source) {
+    for (let key of Reflect.ownKeys(source)) {
+        if ( key !== 'constructor'
+        && key !== 'prototype'
+        && key !== 'name'
+        ) {
+        let desc = Object.getOwnPropertyDescriptor(source, key);
+        Object.defineProperty(target, key, desc);
+        }
+    }
+    }
+    // 继承
+    class DistributedEdit extends mix(Loggable, Serializable) {
+        // ...
+    }
