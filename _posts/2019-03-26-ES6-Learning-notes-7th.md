@@ -102,11 +102,81 @@ Promise是一种异步的解决方案，传统的JS采取了回调函数的模�
 
 另外，调用`resolve || reject`不会终止`executor`函数的执行，但是一般情况下调用了这俩函数之后就应该结束执行了，所以一般在调用这两个函数之后就`return`。
 
-#### then
+#### Promise.prototype.then
 
 前文提到了`then`方法可以用链式写法来调用，因为`then`方法会返回一个新的`Promise`对象；依照上面一段的代码，后一个`then`方法（或`catch`）会等待前一个的状态发生改变才会调用。
 
-#### catch
+#### Promise.prototype.catch
 
-`catch`方法可以说是`then(null, rejection)`的别名，用于指定发生错误时的回调函数。前面的例子也提到过了。
+`catch`方法可以说是`then(null, rejection)`的别名，用于指定发生错误时的回调函数。前面的例子也提到过了。但是要注意这个方法会捕获`then`方法抛出的异常，也更像是`try/catch`块的写法。因此建议都用下面代码的第二种写法，避免用`then(null, rejection)`方法。
+
+    // bad
+    promise
+    .then(function(data) {
+        // success
+    }, function(err) {
+        // error
+    });
+
+    // good
+    promise
+    .then(function(data) { //cb
+        // success
+    })
+    .catch(function(err) {
+        // error
+    });
+
+#### Promise.prototype.finally
+
+这个方法用于指定无论`promise`实例的状态如何都会执行的方法。有点像默认方法的意思，且`finally`方法总是返回原来的值。
+
+    // resolve 的值是 undefined
+    Promise.resolve(2).then(() => {}, () => {})
+
+    // resolve 的值是 2
+    Promise.resolve(2).finally(() => {})
+
+    // reject 的值是 undefined
+    Promise.reject(3).then(() => {}, () => {})
+
+    // reject 的值是 3
+    Promise.reject(3).finally(() => {})
+
+上述代码描述了执行`finally`方法和`then`方法的区别，`then`方法会返回其方法本身返回的值，而`finally`方法会返回原来的值。
+
+#### Promise.all() Promise.race()
+
+两个方法的参数都是一组`Promise`实例，都是将这些实例包装成一个新的`Promise`实例。
+
+方法的区别在于，`all()`方法会等所有参数的状态都变成`fulfilled`，新实例的状态才会变为`fulfilled`，或者有一个参数的状态变成`rejected`，实例的状态就变为`rejected`；`race()`方法的某个参数的状态改变，实例的状态都会改变。
+
+一个应用场景：
+
+    const p = Promise.race([
+    fetch('/resource-that-may-take-a-while'),
+    new Promise(function (resolve, reject) {
+        setTimeout(() => reject(new Error('request timeout')), 5000)
+    })
+    ]);
+
+    p
+    .then(console.log)
+    .catch(console.error);
+
+上述代码如果在5秒内`fetch`方法没得到返回，就会返回`rejected`，实例`p`的状态就会变成`rejected`
+
+### 应用场景
+
+#### 加载图片
+
+    const preloadImage = function (path) {
+    return new Promise(function (resolve, reject) {
+        const image = new Image();
+        image.onload  = resolve;
+        image.onerror = reject;
+        image.src = path;
+    });
+    };
+    preloadImage("http://pic75.nipic.com/file/20150821/9448607_145742365000_2.jpg").then(()=>{console.log('?')}).catch(()=>{console.log('??')})
 
