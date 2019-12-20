@@ -162,6 +162,22 @@ delete p.a;
 
 `defineProperty(target, key, descriptor)`代理`Object.defineProperty`操作；参数为目标对象、属性名、属性描述；如果对象不可扩展，这个方法不能添加对象原本不具有的属性，否则会报错；如果属性不可写或者不可配置，这个方法不能改变这两个设置；
 
+> 原生的`set`方法会触发·defineProperty·的代理方法；
+
+```javascript
+let p = new Proxy(
+  {},
+  {
+    defineProperty(t, k, d) {
+      console.log(t, k, d);
+      return Reflect.defineProperty(t, k, d);
+    }
+  }
+);
+p.a = 10;
+// {} "a" {value: 10, writable: true, enumerable: true, configurable: true}
+```
+
 #### getOwnPropertyDescriptor
 
 `getOwnPropertyDescriptor(target, key)`代理`Object.getOwnPropertyDescriptor()`操作；返回属性描述对象或者`undefined`
