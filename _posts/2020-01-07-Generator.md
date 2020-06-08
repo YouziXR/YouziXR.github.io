@@ -2,11 +2,11 @@
 
 Generator 是一个函数的类型，是 ES6 提供的一种异步编程方案；之所以说是异步的，原因是其函数内部封装了多种状态，函数并不会顺序执行，而是需要手动调用函数的`next`方法，从上一个状态，转移到下一个状态，期间会执行状态转移的中间代码，是不是和`Iterator`接口很像；
 
-和`Iterator`接口更像的地方是，xx 函数会返回一个遍历器对象，可以调用这个对象的`next`方法依次访问函数内部的每个状态，所以其实也可以用遍历方法比如`for of`去访问 Generator 函数的每个状态；
+和`Iterator`接口更像的地方是，Generator 函数会返回一个遍历器对象，可以调用这个对象的`next`方法依次访问函数内部的每个状态，所以其实也可以用遍历方法比如`for of`去访问 Generator 函数的每个状态；
 
 ## 语法
 
-在定义 Generator 函数时，在`function`关键字和函数名之间添加了一个`\*`符号来区别普通函数和 Generator 函数；然后在函数内部，使用`yield`表达式来定义不同的函数状态，yield 是产出的意思，xx 是生成器的意思；
+在定义 Generator 函数时，在`function`关键字和函数名之间添加了一个`\*`符号来区别普通函数和 Generator 函数；然后在函数内部，使用`yield`表达式来定义不同的函数状态，yield 是产出的意思，Generator 是生成器的意思；
 
 ```javascript
 const func1 = () => {
@@ -39,7 +39,7 @@ i.next();
 // {value: undefined, done: true}
 ```
 
-上面的代码声明了三个函数，两个普通函数`func1 | func2`，一个 Generator 函数`gen`；xx 函数有三种状态，两个`yield`语句的状态，一个`return`语句的状态，我们暂时先称这三个状态为状态 1、2、3；
+上面的代码声明了三个函数，两个普通函数`func1 | func2`，一个 Generator 函数`gen`；Generator 函数有三种状态，两个`yield`语句的状态，一个`return`语句的状态，我们暂时先称这三个状态为状态 1、2、3；
 
 执行`gen`函数时，会返回遍历器对象，所以第一条打印语句`?`还没有执行；此时调用`next`方法，函数会执行到第一个状态结束，也就是打印`?`，然后返回对象`{value: "1", done: false}`；一直调用`next`方法，执行到最后一个状态`return`时，此时已经遍历完了，所以会返回最后那个对象，以后再继续调用`next`方法，函数的状态都停留在结束的状态了；
 
@@ -110,7 +110,7 @@ g.next();
 
 #### 与 Iterator 接口的关系
 
-前面也提过，xx 函数会生成一个遍历器对象，所以可以直接把 Generator 函数当成遍历器生成函数，也就是说可以给对象的`Symbol.iterator`属性赋值一个 Generator 函数，使得对象具有遍历器接口；
+前面也提过，Generator 函数会生成一个遍历器对象，所以可以直接把 Generator 函数当成遍历器生成函数，也就是说可以给对象的`Symbol.iterator`属性赋值一个 Generator 函数，使得对象具有遍历器接口；
 
 ```javascript
 let o = {
@@ -132,7 +132,7 @@ for (const iterator of o) {
 // 2
 ```
 
-一个有意思的现象，xx 函数执行后返回的遍历器对象，其本身也具有`Symbol.iterator`属性，执行后返回自身；
+一个有意思的现象，Generator 函数执行后返回的遍历器对象，其本身也具有`Symbol.iterator`属性，执行后返回自身；
 
 ```javascript
 function* gen() {}
@@ -335,7 +335,7 @@ g.next();
 
 ### Generator.prototype.return
 
-和 Iterator 一样，xx 函数返回的遍历器对象还有一个`return`方法，可以返回给定的值并且会终止遍历 Generator 函数。
+和 Iterator 一样，Generator 函数返回的遍历器对象还有一个`return`方法，可以返回给定的值并且会终止遍历 Generator 函数。
 
 ```javascript
 function* gen() {
@@ -489,7 +489,7 @@ function* flatten(ary) {
 
 ### Generator 函数作为对象的属性
 
-在语法上，xx 函数作为对象属性时可以简写：
+在语法上，Generator 函数作为对象属性时可以简写：
 
 ```javascript
 let obj = {
