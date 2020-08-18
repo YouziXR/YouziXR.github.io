@@ -37,7 +37,7 @@ kramdown:
   input: GFM # use Github Flavored Markdown !important
 
 # Disqus settings
-disqus_username: https-youzixr-github-io
+disqus_username: youzixr
 
 # Duoshuo settings
 # duoshuo_username: huxblog
