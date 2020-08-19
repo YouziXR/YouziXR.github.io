@@ -6,7 +6,7 @@ email: youzi_xr@sina.com
 description: 'Youzi的Blog-开发笔记'
 keyword: 'Youzi'
 url: 'https://youzixr.github.io' # your host, for absolute URL
-baseurl: '/youzixr.github.io' # for example, '/blog' if your blog hosted on 'host/blog'
+baseurl: '' # for example, '/blog' if your blog hosted on 'host/blog'
 
 # SNS settings
 RSS: false
