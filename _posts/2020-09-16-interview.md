@@ -141,7 +141,24 @@ MDN 的一段测试哪个方法先触发的代码，改造了下；
 
 ## HTTPS / HTTP1.X-2.0-3.0
 
-## new 做了什么
+## `this`相关
+
+### 基础
+
+`this`指向最后调用该函数的对象。
+
+#### 绑定规则
+
+- 默认绑定在`window`对象上，但在严格模式下，`this`是指向`undefined`的；
+- 隐式绑定在调用对象上；
+- 通过`call, apply, bind`方法改变绑定对象；
+- 通过`new`，此时`this`指向由`new`构造出来的新对象。
+
+#### `call, apply, bind`
+
+`call / apply`都是立即执行的，一旦被调用，除了改变`this`的指向之外，还会立即执行调用这俩方法的函数，比如`A.call(null)`，会立即执行`A`函数；`bind`不会立即执行而是返回一个新的函数，所以很明显`bind`会在内部新建一个函数；
+
+#### `new` 做了什么
 
 new 运算接受一个构造器和一组调用参数，实际上做了几件事：
 
@@ -150,6 +167,98 @@ new 运算接受一个构造器和一组调用参数，实际上做了几件事�
 - 如果构造器返回的是对象，则返回，否则返回第一步创建的对象。如果构造函数内部返回了一个对象字面量，那这里返回的就应该是构造函数内部的对象，而不是第一步创建的对象。
 
 new 这样的行为，试图让函数对象在语法上跟类变得相似，但是，它客观上提供了两种方式，一是在构造器中添加属性，二是在构造器的 prototype 属性上添加属性。
+
+#### 优先级顺序
+
+`new > call,apply,bind > 隐式绑定 > 默认绑定`
+
+#### 手写 bind / call / apply
+
+**`bind`**
+
+`bind`函数做了以下几件事，例子代码
+
+```javascript
+let newFunc = callFunc.bind(context, args1);
+newFunc(args2);
+```
+
+- 改变调用函数`newFunc`的`this`指向，指向第一个参数`context`，`args1`可以成为前置参数，在调用`bind`时传入的；
+- 返回了一个新函数`newFunc`，在被调用执行时可以后续参数`args2`；
+- 特殊情况：如果`newFunc`是一个构造函数（当它被`new`运算符操作时），会忽略第一个参数`context`，将`this`绑定在经过`new`得到的实例对象上；
+
+```javascript
+Function.prototype.myBind = function (thisObj, ...args1) {
+  // 记录当前调用myBind函数的函数
+  let callFunc = this;
+  if (typeof callFunc !== 'function') {
+    throw new TypeError('call function type error');
+  }
+  // bind会返回一个新的函数，还记得吧
+  // 函数参数是原调用函数的参数
+  // 注意newFunc函数始终都要执行的，所以在其内部最后还是要显示调用apply或者call函数
+  function newFunc(...args2) {
+    // 判断newFunc是否是被new关键字调用的
+    if (this instanceof newFunc) {
+      // 如果newFunc函数是被new调用的，那此时的this应该指向的是new出来的实例，说白了就是当前的this
+      // 在MDN中也提到过，如果调用bind之后返回的函数，用了new运算符，那其实会忽略掉bind的第一个参数thisObj
+      return callFunc.call(this, ...args1, ...args2);
+    } else {
+      // 不是被new调用的情况，那此时的this应该指向myBind第一个参数thisObj
+      return callFunc.call(thisObj, ...args1, ...args2);
+    }
+  }
+  // 让新函数的原型指向旧函数的原型，这样可以继承旧函数原型上的所有对象和方法
+  newFunc.prototype = callFunc.prototype;
+  return newFunc;
+};
+```
+
+这里的写法，最后一步还有些问题，我们为了让`newFunc`能继承旧函数原型上的方法，手动改变了`prototype`，这就会导致如果修改了`newFunc`的`prototype`，旧函数的原型也会被修改；为了避免，其实也很简单，我们可以利用实例继承的模式，在最后加上：
+
+```javascript
+let fn = function () {};
+fn.prototype = callFunc.prototype;
+newFunc.prototype = new fn();
+```
+
+**`call`**
+
+`call`方法做了什么，例子代码：
+
+```javascript
+let obj = {
+  func1(arg) {
+    console.log(arg, this.arg1);
+  }
+};
+let context = {
+  arg1: 111
+};
+obj.func1.call(context, 222);
+```
+
+- 将调用函数`func1`执行时的`this`改变为第一个参数`context`，在此基础上，执行`func1`，并返回结果；
+- 值得注意的是，`call`方法并不会改变`context`，也不会在`context`上添加`func1`属性；
+
+```javascript
+Function.prototype.myCall = function (thisObj, ...args) {
+  let callFunc = this;
+  thisObj = thisObj || window;
+  // 隐式地将this绑定在调用对象上
+  thisObj.fn = callFunc;
+  let res = thisObj.fn(...args);
+  // 调用完后删除该对象上的属性
+  Reflect.deleteProperty(thisObj, 'fn');
+  return res;
+};
+```
+
+这样写一般就差不多了，不过有的面试官可能会问如果`thisObj`本身就有`fn`这个属性呢，那其实这里还可以改进一下，就是给`fn`加一个随机数，先判断`thisObj`有没有这个属性，再去调用，最后再删掉。
+
+**`apply`**
+
+其实和`call`差不多只是参数要传数组，所以要先判断下传入的参数是否存在，不存在就直接调用，不传参；
 
 ## 华为 OD 笔试
 
