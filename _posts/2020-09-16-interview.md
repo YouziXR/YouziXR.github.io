@@ -400,3 +400,24 @@ print(sum);
 1. 虚拟滚动
 2. tree-shaking
 3. 工程化优势
+
+## Promise 相关内容
+
+### 实现 Sleep 函数
+
+```javascript
+const sleep = async time => {
+  await new Promise(res => {
+    setTimeout(() => {
+      // 注意一定要让await语句的状态转变成fulfilled，所以一定要调用res()
+      res();
+    }, time);
+  });
+};
+const test = async () => {
+  for (const i of [1, 2, 3]) {
+    await sleep(500);
+    console.log(i);
+  }
+};
+```
