@@ -394,3 +394,9 @@ if (tmpSum !== 0) {
 print(sum);
 // function findTmpSum(n) {}
 ```
+
+## 零散
+
+1. 虚拟滚动
+2. tree-shaking
+3. 工程化优势

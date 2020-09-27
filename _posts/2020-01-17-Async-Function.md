@@ -101,7 +101,7 @@ asyncPrint('hello world', 500);
 
 另一个要提出来的点就是，`await`整个表达式的值，取决于`await`表达式执行后的返回值，比如上面的代码明确了返回值是`10`；如果没有明确的`return`语句，那么得到的就是`undefined`了，和函数没有返回值是一样的，合理；
 
-如果`asyncPrint`函数中`timeout`调用时没有`async`关键字，那么`t`应该是一个`Promise`对象实例，看例子：
+如果`asyncPrint`函数中`timeout`调用时没有`await`关键字，那么`t`应该是一个`Promise`对象实例，看例子：
 
 ```javascript
 async function timeout(ms) {
