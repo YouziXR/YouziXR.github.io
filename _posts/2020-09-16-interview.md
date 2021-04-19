@@ -57,9 +57,90 @@ Vue2.0 中，随着功能的增加，组件变得越来越复杂，越来越难�
 
 - 在浏览器中从 URL 输入到页面展现到底发生什么？
 - 浏览器渲染过程
-- 渲染中读到`<script> / <style>`会发生什么，`script`标签的阻塞情况，如何避免阻塞
 
-关于网络的相关问题，详见这篇[URL 到渲染的过程](/2021/03/08/URL到渲染的过程/)
+**关于渲染过程的相关问题**，详见这篇[URL 到渲染的过程](/2021/03/08/URL到渲染的过程/)
+
+其他的一些零散问题：
+
+- `get | post`区别；
+
+  - GET 在浏览器回退时是无害的，而 POST 会再次提交请求。
+  - GET 产生的 URL 地址可以被 Bookmark，而 POST 不可以。
+  - GET 请求会被浏览器主动 cache，而 POST 不会，除非手动设置。
+  - GET 请求只能进行 url 编码，而 POST 支持多种编码方式。
+  - GET 请求参数会被完整保留在浏览器历史记录里，而 POST 中的参数不会被保留。
+  - GET 请求在 URL 中传送的参数是有长度限制的，而 POST 么有。
+  - 对参数的数据类型，GET 只接受 ASCII 字符，而 POST 没有限制。
+  - GET 比 POST 更不安全，因为参数直接暴露在 URL 上，所以不能用来传递敏感信息。
+  - GET 参数通过 URL 传递，POST 放在 Request body 中。
+
+### 跨域问题详解
+
+跨域问题一般有以下几个解决方案：
+
+#### JSONP 模式
+
+利用了`<script>`标签可以请求跨域资源的特性，在 JS 代码中手动构造该标签，且`src`属性改为接口地址（注意只能作用于 GET 请求），参数也可以附带在地址上，甚至回调函数也可以附带在地址上；后端接口接收到请求后，返回约定好的函数名（或者获取前端传过来的函数名），附上真正需要返回的数据做为函数参数，这样前端接收到响应后，就会调用回调函数，执行后续逻辑。
+
+#### CORS
+
+> CORS 模式；跨域资源共享，是一种 HTTP 头的机制，这个机制允许服务器设置除了当前域以外的其他域，访问获得资源；
+
+> 如果使用`fetch`作为请求方法，要提到一个配置`request.mode`，详见：[https://developer.mozilla.org/zh-CN/docs/Web/API/Request/mode#%E5%B1%9E%E6%80%A7%E5%80%BC](https://developer.mozilla.org/zh-CN/docs/Web/API/Request/mode#%E5%B1%9E%E6%80%A7%E5%80%BC)，这个配置里有一些令人迷惑的地方，比如设置了当前请求为`no-cors`，这会让浏览器不去拦截跨域的请求，但是，不能读取任何的`response`对象，这不就是等于没法出去嘛，只是没报错而已。。首先在使用这个模式之前，我们要明确一点，没有配置 CORS 响应头的服务器，请求是没办法突破浏览器的跨域阻拦的，所以首先要在服务器的响应头上设置：
+
+```sh
+Access-Control-Allow-Origin: *
+```
+
+该字段配置允许通过 CORS 的客户端，`*`表示通配符，任意域都可以通过；也可以配置为一个固定的`URI`，注意不能配置多个`URI`。
+
+仅设置这个字段，CORS 只会允许*简单请求*通过；
+
+> 简单请求：[简单请求](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS#%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
+
+- 特指不会发送`preflight request`（预检请求）的请求，这个后面会讲什么是预检请求；
+- 请求方法只能是`GET | HEAD | POST`；
+- `Content-Type`字段只能是以下值：
+
+  - `text/plain`
+  - `multipart/form-data`
+  - `application/x-www-form-urlencoded`
+
+- 其他的要求详见上面的链接，符合字段限制即可；
+
+> 除去简单请求，剩下的的就是非简单请求，这些请求会在发送真实请求之前，先发送一个预检请求：[预检请求](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS#%E9%A2%84%E6%A3%80%E8%AF%B7%E6%B1%82)
+
+预检请求是一个`OPTIONS`方法的请求，目的是为了检测真实请求是否可以被服务器所接受；浏览器会给预检请求附上两个 headers：
+
+- Access-Control-Request-Headers：真实请求携带的自定义头部字段（不属于简单请求的 header）；
+- Access-Control-Request-Method：真实请求使用的请求方法；
+
+服务器依靠预检请求，来判断是否通过 CORS，预检请求也会返回这俩字段，表示服务器支持的所有请求头和请求方法，后面会再提到的；预检请求的存在是有必要的，为了应对服务器可能接收的各种奇怪的请求，预先使用预检请求来规避接收到真实请求的风险，对服务器的安全性也更有保障。
+
+> 跨域请求带 cookie
+
+首先在前端处理上，如果用 XHR，则要设置`xhr.withCredentials = true`；如果使用`fetch`要加上`credentials: 'include'`，才会使得请求带上 cookie；另外在后端服务器上，要满足：
+
+- 后端 `Response header` 有 `Access-Control-Allow-Credentials: true`
+- 后端 `Response header` 的 `Access-Control-Allow-Origin` 不能是`*`，要明确指定某个域
+
+值得注意的是，**如果后端需要设置 cookie，也需要满足上述条件**
+
+> 跨域请求带自定义头部
+
+跨域请求要带上自定义头部，同样需要后端服务器配合，需要往头部加入`Access-Control-Expose-Headers`字段，字段的值就是需要添加的自定义头部；举个例子，比如前后端自定义了头部`business-http-header`，通过这个头部来传输一些信息，如果不加`Access-Control-Expose-Headers: business-http-header`，则客户端通过响应头是获取不到这个头部携带的信息的，因为并没有暴露给 JS；
+
+> 跨域请求使用除了`GET/POST/HEAD`的其他方法
+
+刚刚说过了简单请求也只包含上述三种方法，所以如果想要发起其他方法的请求比如`PATCH/DELETE`等，还需要后端配置`Access-Control-Allow-Methods`表示支持跨域的其他请求方法；
+
+这个字段和前几个也差不多，就是规定除了简单请求的方法外还允许哪些方法通过 CORS；
+
+> 大量预检请求占用带宽
+
+前面提到过，如果发送的不是简单请求，则浏览器会自动先发送一个预检请求到服务器，获取服务器支持的请求头和请求方法；如果每个非简单请求都这样去做一次预检请求的话，那服务器的 HTTP 连接数会有很多浪费，所以还需要加上`Access-Allow-Max-Age: 100`表示预检请求的返回值，最多能被客户端缓存多长时间（这里写的是 100 秒），一般可以被设置为最大值`86400`秒（即 24 小时）
+
+#### 渲染中读到`<script> / <style>`会发生什么，`script`标签的阻塞情况，如何避免阻塞
 
 ## 事件循环
 
