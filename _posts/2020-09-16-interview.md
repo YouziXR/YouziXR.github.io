@@ -71,7 +71,7 @@ Vue2.0 中，随着功能的增加，组件变得越来越复杂，越来越难�
 JS 原生方法`window.onload`和`jQuery(document).ready`对比；
 
 - `ready`比`onload`先触发；因为`ready`只需要`dom`解析完成之后就会触发，而`onload`是在页面所有元素加载完成之后（比如要等待`img, script`等静态资源请求结束后）才会触发。
-- `ready`方法可以定义多个，会按序执行；`onload`如果定义多个，只会执行最后一个，毕竟通常写法是给`winodw.onready = function(){}`这样去赋值，会覆盖掉。
+- `ready`方法可以定义多个，会按序执行；`onload`如果定义多个，只会执行最后一个，毕竟通常写法是给`winodw.onload = function(){}`这样去赋值，会覆盖掉。
 
 另外再补充一下`DOMContentLoaded`事件，这个事件触发机制几乎和`ready`一样。当纯 HTML 被完全加载以及解析时，DOMContentLoaded 事件会被触发，而不必等待样式表，图片或者子框架完成加载。
 
