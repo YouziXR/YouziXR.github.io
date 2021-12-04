@@ -1,0 +1,69 @@
+# Site settings
+title: Youzi Blog
+SEOTitle: Youzi Blog
+header-img: img/home-bg.jpg
+email: youzi_xr@sina.com
+description: 'Youzi的Blog-开发笔记'
+keyword: 'Youzi'
+url: 'https://youzixr.github.io' # your host, for absolute URL
+baseurl: '' # for example, '/blog' if your blog hosted on 'host/blog'
+
+# SNS settings
+RSS: false
+weibo_username: 是阿鼬啊
+# zhihu_username:
+github_username: YouziXR
+#twitter_username:  huxpro
+# facebook_username:  huxpro
+
+# Build settings
+# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
+highlighter: rouge
+permalink: pretty
+paginate: 20
+exclude: ['less', 'node_modules', 'Gruntfile.js', 'package.json', 'README.md']
+anchorjs: true # if you want to customize anchor. check out line:181 of `post.html`
+
+# Gems
+# from PR#40, to support local preview for Jekyll 3.0
+gems: [jekyll-paginate]
+
+# Markdown settings
+# replace redcarpet to kramdown,
+# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
+# document: http://jekyllrb.com/docs/configuration/#kramdown
+markdown: kramdown
+kramdown:
+  input: GFM # use Github Flavored Markdown !important
+  syntax_highlighter_opts:
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+# Disqus settings
+disqus_username: youzixr
+
+# Duoshuo settings
+# duoshuo_username: huxblog
+# Share component is depend on Comment so we can NOT use share only.
+# duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+
+# Analytics settings
+# Baidu Analytics
+ba_track_id: e092b4daaaf419d138135a1924fe2985
+# Google Analytics
+# ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
+# ga_domain: huangxuan.me
+
+# Sidebar settings
+sidebar: true # whether or not using Sidebar.
+sidebar-about-description: '写代码的臭弟弟'
+sidebar-avatar: ./img/avatar-goku.jpg # use absolute URL, seeing it's used in both `/` and `/about/`
+
+# Featured Tags
+featured-tags: true # whether or not using Feature-Tags
+featured-condition-size: 1 # A tag will be featured if the size of it is more than this condition value
+
+# Friends
+friends: [{ title: 'Hux Blog', href: 'http://huangxuan.me' }]
